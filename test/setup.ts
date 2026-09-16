@@ -16,5 +16,6 @@ beforeEach(async () => {
   await env.DB.batch([
     env.DB.prepare('DELETE FROM clicks'),
     env.DB.prepare('DELETE FROM links'),
+    env.DB.prepare('DELETE FROM api_tokens'),
   ])
 })
