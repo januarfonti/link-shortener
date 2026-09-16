@@ -17,7 +17,8 @@ link-shortener/
 │   ├── 05-CUSTOM-DOMAIN.md        # Set up your own domain
 │   ├── 06-ZERO-TRUST.md           # Protect the admin page
 │   ├── 07-FEATURES.md             # Feature documentation
-│   └── 08-TROUBLESHOOTING.md      # Common error solutions
+│   ├── 08-TROUBLESHOOTING.md      # Common error solutions
+│   └── 09-MCP.md                  # Connect AI agents via MCP
 ```
 
 ---
@@ -32,6 +33,7 @@ link-shortener/
 | **Custom Slugs** | Create links like `go.domain.com/promo` |
 | **Admin Dashboard** | Modern UI to manage all links |
 | **Secure** | Protected by Cloudflare Access (Zero Trust) |
+| **AI-Ready** | MCP server lets AI agents create and manage links |
 | **Your Own Domain** | Use your domain, not someone else's |
 
 ---
@@ -105,6 +107,7 @@ npm run deploy
 | [06-ZERO-TRUST.md](./06-ZERO-TRUST.md) | Protect admin with Cloudflare Access |
 | [07-FEATURES.md](./07-FEATURES.md) | Full feature documentation |
 | [08-TROUBLESHOOTING.md](./08-TROUBLESHOOTING.md) | Solutions for common errors |
+| [09-MCP.md](./09-MCP.md) | Connect AI agents (Hermes, Claude, and more) via MCP |
 
 ---
 

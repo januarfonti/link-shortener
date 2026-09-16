@@ -58,6 +58,18 @@ Under **Application domain**:
 | Domain | Select `yourdomain.com` |
 | Path | `admin` |
 
+Then add a second path for the API. Click **Add domain** (or **+ Add public hostname**) and fill in:
+
+| Field | Value |
+|-------|-------|
+| Subdomain | `go` |
+| Domain | Select `yourdomain.com` |
+| Path | `api` |
+
+> ⚠️ **Protect `api` as well as `admin`.** The dashboard calls `/api/links` and `/api/tokens` from your browser, so they share the same login. If `/api` is public, anyone can edit your links and create MCP tokens.
+>
+> Do **not** add `mcp`. The MCP endpoint uses its own bearer tokens (see [09-MCP.md](./09-MCP.md)).
+
 Click **Next**.
 
 ---
@@ -100,6 +112,10 @@ Click **Next**.
 4. Check your inbox for the OTP code
 5. Enter the OTP code
 6. You're now logged into the admin dashboard!
+7. Open a private/incognito window and visit `https://go.yourdomain.com/api/links`. You should be redirected to the Access login page, not see JSON.
+8. In the same private window, visit `https://go.yourdomain.com/api/tokens`. It should also redirect to the login page.
+
+If `/api/links` or `/api/tokens` returns JSON in a private window, the `api` path is not protected. Recheck step 4 (if your dashboard does not cover sub-paths with `api`, use `api/*`).
 
 ---
 
@@ -169,6 +185,8 @@ https://your-team-name.cloudflareaccess.com/cdn-cgi/access/logout
 
 - [ ] Zero Trust is set up
 - [ ] Application for admin is created
+- [ ] `api` path added to the same application
+- [ ] `/api/links` redirects to login in a private window
 - [ ] Policy with email is configured
 - [ ] Login via OTP works
 - [ ] Admin dashboard accessible after auth
