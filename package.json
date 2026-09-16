@@ -9,14 +9,17 @@
     "preview": "vite preview",
     "deploy": "npm run build && wrangler pages deploy ./dist",
     "db:init": "wrangler d1 execute link-shortener-db --local --file=./db/schema.sql",
-    "db:init:remote": "wrangler d1 execute link-shortener-db --remote --file=./db/schema.sql"
+    "db:init:remote": "wrangler d1 execute link-shortener-db --remote --file=./db/schema.sql",
+    "test": "vitest run",
+    "typecheck:worker": "tsc -p tsconfig.worker.json"
   },
   "dependencies": {
     "vue": "^3.5.24",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251219.0",
+    "@cloudflare/vitest-plugin": "^1.1.10",
+    "@cloudflare/workers-types": "^5.20260916.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
@@ -26,7 +29,8 @@
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
+    "vitest": "~4.1.0",
     "vue-tsc": "^3.1.4",
-    "wrangler": "^4.56.0"
+    "wrangler": "^4.132.0"
   }
 }
