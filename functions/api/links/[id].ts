@@ -1,65 +1,25 @@
-interface Env {
-  DB: D1Database
-}
-
-interface Link {
-  id: number
-  slug: string
-  destination_url: string
-  created_at: string
-  updated_at: string
-  click_count: number
-}
-
-interface Click {
-  id: number
-  link_id: number
-  clicked_at: string
-  referrer: string | null
-}
+import type { Env } from '../../../lib/env'
+import { LinkError, deleteLink, getLinkById, getRecentClicks, updateLink } from '../../../lib/links'
 
 interface UpdateLinkBody {
   slug?: string
   destination_url?: string
 }
 
-const RESERVED_SLUGS = ['admin', 'api', 'static', 'assets', '_headers', '_redirects']
-
-function isValidUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url)
-    return ['http:', 'https:'].includes(parsed.protocol)
-  } catch {
-    return false
-  }
-}
-
-function isValidSlug(slug: string): boolean {
-  const slugRegex = /^[a-zA-Z0-9-]{3,50}$/
-  return slugRegex.test(slug) && !RESERVED_SLUGS.includes(slug.toLowerCase())
+function notFound(): Response {
+  return Response.json(
+    { success: false, error: 'Link not found' },
+    { status: 404 }
+  )
 }
 
 // GET /api/links/:id - Get link with analytics
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const id = context.params.id
+  const id = context.params.id as string
 
   try {
-    // Get the link
-    const link = await context.env.DB.prepare(
-      'SELECT * FROM links WHERE id = ?'
-    ).bind(id).first<Link>()
-
-    if (!link) {
-      return Response.json(
-        { success: false, error: 'Link not found' },
-        { status: 404 }
-      )
-    }
-
-    // Get recent clicks (last 100)
-    const { results: clicks } = await context.env.DB.prepare(
-      'SELECT * FROM clicks WHERE link_id = ? ORDER BY clicked_at DESC LIMIT 100'
-    ).bind(id).all<Click>()
+    const link = await getLinkById(context.env.DB, id)
+    const clicks = await getRecentClicks(context.env.DB, id, 100)
 
     return Response.json({
       success: true,
@@ -69,6 +29,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       }
     })
   } catch (error) {
+    if (error instanceof LinkError && error.code === 'not_found') return notFound()
     console.error('Error fetching link:', error)
     return Response.json(
       { success: false, error: 'Failed to fetch link' },
@@ -77,82 +38,30 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 }
 
+const UPDATE_ERRORS: Partial<Record<LinkError['code'], [number, string]>> = {
+  not_found: [404, 'Link not found'],
+  invalid_url: [400, 'Invalid destination URL'],
+  invalid_slug: [400, 'Invalid slug'],
+  slug_taken: [409, 'Slug already exists'],
+  no_changes: [400, 'No valid fields to update'],
+}
+
 // PUT /api/links/:id - Update a link
 export const onRequestPut: PagesFunction<Env> = async (context) => {
-  const id = context.params.id
+  const id = context.params.id as string
 
   try {
     const body = await context.request.json<UpdateLinkBody>()
-
-    // Check if link exists
-    const existing = await context.env.DB.prepare(
-      'SELECT * FROM links WHERE id = ?'
-    ).bind(id).first<Link>()
-
-    if (!existing) {
-      return Response.json(
-        { success: false, error: 'Link not found' },
-        { status: 404 }
-      )
-    }
-
-    // Validate updates
-    const updates: string[] = []
-    const values: (string | number)[] = []
-
-    if (body.destination_url !== undefined) {
-      if (!isValidUrl(body.destination_url)) {
-        return Response.json(
-          { success: false, error: 'Invalid destination URL' },
-          { status: 400 }
-        )
-      }
-      updates.push('destination_url = ?')
-      values.push(body.destination_url)
-    }
-
-    if (body.slug !== undefined) {
-      const slug = body.slug.trim()
-      if (!isValidSlug(slug)) {
-        return Response.json(
-          { success: false, error: 'Invalid slug' },
-          { status: 400 }
-        )
-      }
-
-      // Check if new slug already exists (on a different link)
-      const slugExists = await context.env.DB.prepare(
-        'SELECT id FROM links WHERE slug = ? AND id != ?'
-      ).bind(slug, id).first()
-
-      if (slugExists) {
-        return Response.json(
-          { success: false, error: 'Slug already exists' },
-          { status: 409 }
-        )
-      }
-
-      updates.push('slug = ?')
-      values.push(slug)
-    }
-
-    if (updates.length === 0) {
-      return Response.json(
-        { success: false, error: 'No valid fields to update' },
-        { status: 400 }
-      )
-    }
-
-    // Add updated_at
-    updates.push('updated_at = CURRENT_TIMESTAMP')
-    values.push(id as unknown as string)
-
-    const result = await context.env.DB.prepare(
-      `UPDATE links SET ${updates.join(', ')} WHERE id = ? RETURNING *`
-    ).bind(...values).first<Link>()
-
-    return Response.json({ success: true, data: result })
+    const link = await updateLink(context.env.DB, id, {
+      destination_url: body.destination_url,
+      slug: body.slug,
+    })
+    return Response.json({ success: true, data: link })
   } catch (error) {
+    const mapped = error instanceof LinkError ? UPDATE_ERRORS[error.code] : undefined
+    if (mapped) {
+      return Response.json({ success: false, error: mapped[1] }, { status: mapped[0] })
+    }
     console.error('Error updating link:', error)
     return Response.json(
       { success: false, error: 'Failed to update link' },
@@ -163,28 +72,14 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
 // DELETE /api/links/:id - Delete a link
 export const onRequestDelete: PagesFunction<Env> = async (context) => {
-  const id = context.params.id
+  const id = context.params.id as string
 
   try {
-    // Check if link exists
-    const existing = await context.env.DB.prepare(
-      'SELECT id FROM links WHERE id = ?'
-    ).bind(id).first()
-
-    if (!existing) {
-      return Response.json(
-        { success: false, error: 'Link not found' },
-        { status: 404 }
-      )
-    }
-
-    // Delete the link (clicks will be cascade deleted)
-    await context.env.DB.prepare(
-      'DELETE FROM links WHERE id = ?'
-    ).bind(id).run()
-
+    // Clicks are cascade deleted
+    await deleteLink(context.env.DB, id)
     return Response.json({ success: true, data: { id } })
   } catch (error) {
+    if (error instanceof LinkError && error.code === 'not_found') return notFound()
     console.error('Error deleting link:', error)
     return Response.json(
       { success: false, error: 'Failed to delete link' },
