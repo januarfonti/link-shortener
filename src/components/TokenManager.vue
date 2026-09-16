@@ -8,6 +8,7 @@ const { tokens, loading, error, fetchTokens, createToken, revokeToken, clearErro
 const name = ref('')
 const newToken = ref<string | null>(null)
 const copied = ref(false)
+const copyFailed = ref(false)
 
 onMounted(() => {
   fetchTokens()
@@ -23,13 +24,20 @@ async function handleCreate() {
 
 async function copyToken() {
   if (!newToken.value) return
-  await navigator.clipboard.writeText(newToken.value)
-  copied.value = true
+  try {
+    await navigator.clipboard.writeText(newToken.value)
+    copied.value = true
+    copyFailed.value = false
+  } catch (e) {
+    copyFailed.value = true
+    console.error('Copy token error:', e)
+  }
 }
 
 function closeTokenDialog() {
   newToken.value = null
   copied.value = false
+  copyFailed.value = false
 }
 
 async function handleRevoke(token: ApiToken) {
@@ -152,6 +160,9 @@ function formatDate(dateString: string | null): string {
             You won't see this token again. Store it in your agent's config now.
           </p>
           <code class="block w-full break-all bg-gray-100 rounded-lg px-3 py-2 text-sm font-mono text-gray-900">{{ newToken }}</code>
+          <p v-if="copyFailed" class="text-sm text-red-600">
+            Copy failed. Select the token above and copy it manually.
+          </p>
           <div class="flex justify-end space-x-3">
             <button
               @click="copyToken"
