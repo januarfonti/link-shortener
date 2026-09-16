@@ -24,6 +24,8 @@ A self-hosted URL shortener built with Vue 3, Cloudflare Pages, and D1. Free hos
 
 ## Quick Start
 
+> Requires Node.js 22 or later.
+
 ```bash
 # Install dependencies
 npm install
@@ -46,7 +48,15 @@ npm run db:init:remote
 npm run deploy
 ```
 
-> **Upgrading an existing install?** Re-run `npm run db:init:remote`. Every statement uses `IF NOT EXISTS`, so it only adds the new `api_tokens` table and leaves your links untouched.
+> **Upgrading an existing install?** Follow these steps in order:
+>
+> 1. Add `api` to your Cloudflare Access application, alongside `admin` (see [docs/06-ZERO-TRUST.md](docs/06-ZERO-TRUST.md)). Confirm it worked: in a private window, `/api/links` should redirect to the Access login page, not return JSON.
+> 2. Run `npm run db:init:remote`. Every statement uses `IF NOT EXISTS`, so it only adds the new `api_tokens` table and leaves your links untouched.
+> 3. Deploy.
+>
+> After enabling Access, open **API Tokens** in `/admin` and revoke any token you don't recognize.
+>
+> A link with the slug `mcp` stops working after upgrading, because `/mcp` is now the MCP endpoint.
 
 ## Local Development
 
@@ -177,6 +187,8 @@ POST /api/links
 ## Securing Your Deployment
 
 > ⚠️ **Protect both `/admin` and `/api` with Cloudflare Access.** Without it, anyone who finds your domain can create, edit, and delete links, and mint API tokens that grant the same access over MCP.
+
+Access for `/api` must be configured **before you deploy this version**. Otherwise, anyone can mint an API token while `/api` is briefly public, and that token keeps working even after you enable Access.
 
 - Add **both** `admin` and `api` paths to your Cloudflare Access application. See [docs/06-ZERO-TRUST.md](docs/06-ZERO-TRUST.md).
 - Do **not** put `/mcp` behind Access. It is protected by bearer tokens.

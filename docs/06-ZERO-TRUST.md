@@ -1,6 +1,6 @@
 # 06 - Zero Trust (Cloudflare Access)
 
-Guide to protecting the admin page with Cloudflare Access.
+Guide to protecting the admin dashboard and the API with Cloudflare Access.
 
 ---
 
@@ -49,6 +49,8 @@ Fill in the form:
 |-------|-------|
 | Application name | `Link Shortener Admin` |
 | Session duration | `24 hours` |
+
+> This single application protects both the admin dashboard and the API — you'll add the `api` path alongside `admin` below.
 
 Under **Application domain**:
 

@@ -15,7 +15,7 @@ link-shortener/
 │   ├── 03-WRANGLER-SETUP.md       # Install & configure CLI
 │   ├── 04-DEPLOYMENT.md           # Deploy to production
 │   ├── 05-CUSTOM-DOMAIN.md        # Set up your own domain
-│   ├── 06-ZERO-TRUST.md           # Protect the admin page
+│   ├── 06-ZERO-TRUST.md           # Protect the admin dashboard and API
 │   ├── 07-FEATURES.md             # Feature documentation
 │   ├── 08-TROUBLESHOOTING.md      # Common error solutions
 │   └── 09-MCP.md                  # Connect AI agents via MCP
@@ -63,7 +63,7 @@ link-shortener/
 
 ## Prerequisites
 
-- Node.js 18 or later
+- Node.js 22 or later
 - Cloudflare account (free)
 - Domain (optional, you can use a free Cloudflare subdomain)
 - Terminal / Command Prompt
@@ -104,7 +104,7 @@ npm run deploy
 | [03-WRANGLER-SETUP.md](./03-WRANGLER-SETUP.md) | Install and configure the Wrangler CLI |
 | [04-DEPLOYMENT.md](./04-DEPLOYMENT.md) | Deploy the app to Cloudflare Pages |
 | [05-CUSTOM-DOMAIN.md](./05-CUSTOM-DOMAIN.md) | Set up a custom domain |
-| [06-ZERO-TRUST.md](./06-ZERO-TRUST.md) | Protect admin with Cloudflare Access |
+| [06-ZERO-TRUST.md](./06-ZERO-TRUST.md) | Protect the admin dashboard and API with Cloudflare Access |
 | [07-FEATURES.md](./07-FEATURES.md) | Full feature documentation |
 | [08-TROUBLESHOOTING.md](./08-TROUBLESHOOTING.md) | Solutions for common errors |
 | [09-MCP.md](./09-MCP.md) | Connect AI agents (Hermes, Claude, and more) via MCP |

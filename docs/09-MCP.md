@@ -19,7 +19,7 @@ The [Model Context Protocol](https://modelcontextprotocol.io) is a standard way 
 
 ## 1. Before You Start
 
-Make sure `/api` is protected by Cloudflare Access (see [06-ZERO-TRUST.md](./06-ZERO-TRUST.md)). The token management API lives under `/api/tokens`; if it is public, anyone can create a token.
+Configure Cloudflare Access for `/api` **before** deploying this version (see [06-ZERO-TRUST.md](./06-ZERO-TRUST.md)). The token management API lives under `/api/tokens`; if it's public even briefly, anyone can mint a token that keeps working after you lock `/api` down. After enabling Access, open **API Tokens** in `/admin` and revoke any token you don't recognize.
 
 If you are upgrading an existing install, add the new table:
 
@@ -156,7 +156,8 @@ npx @modelcontextprotocol/inspector
 1. Transport: **Streamable HTTP**
 2. URL: `https://go.yourdomain.com/mcp` (or `http://localhost:8788/mcp` with `npm run dev:wrangler`)
 3. Add header `Authorization: Bearer lsk_your_token`
-4. Click **Connect**, then **List Tools**
+4. Keep the Inspector's default proxy connection mode. Don't switch to "Direct" — browsers can't call `/mcp` directly because CORS does not allow the `Authorization` header.
+5. Click **Connect**, then **List Tools**
 
 ---
 
@@ -190,7 +191,7 @@ Cloudflare's free plan includes one WAF rate-limiting rule.
 | `406 Not Acceptable` | Client does not send `Accept: application/json, text/event-stream` | Use a standard MCP client, or add the header |
 | `405 Method Not Allowed` | Client tried `GET` (SSE) or `DELETE` | Configure the client for Streamable HTTP; this server is stateless |
 | Redirected to a Cloudflare login page | `/mcp` is behind Access | Remove `/mcp` from the Access application; only `admin` and `api` should be protected |
-| `no such table: api_tokens` | Schema not updated | Run `npm run db:init:remote` |
+| `/mcp` returns `500 {"error":"Internal error"}`, or the dashboard shows "Failed to fetch tokens" (and `npx wrangler pages deployment tail` shows `no such table: api_tokens`) | Schema not updated | Run `npm run db:init:remote` |
 
 ---
 

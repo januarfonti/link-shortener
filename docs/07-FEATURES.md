@@ -141,6 +141,7 @@ The following paths cannot be used as slugs:
 
 - `admin` - Admin dashboard
 - `api` - API endpoints
+- `mcp` - MCP endpoint for AI agents
 - `static` - Static files
 - `assets` - Asset files
 
@@ -157,6 +158,12 @@ For advanced users, you can access the API directly:
 | `GET` | `/api/links/:id` | Link details + analytics |
 | `PUT` | `/api/links/:id` | Update a link |
 | `DELETE` | `/api/links/:id` | Delete a link |
+| `GET` | `/api/tokens` | List API tokens |
+| `POST` | `/api/tokens` | Create an API token |
+| `DELETE` | `/api/tokens/:id` | Revoke an API token |
+| `POST` | `/mcp` | MCP endpoint for AI agents (bearer token, not Access) |
+
+> `/api/*` requests need an active Cloudflare Access session. Without one (e.g. `curl` from a terminal), you'll get the Access login page instead of JSON — see [06-ZERO-TRUST.md](./06-ZERO-TRUST.md).
 
 ### Example: Create Link via API
 

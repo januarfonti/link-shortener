@@ -6,7 +6,7 @@ Before you begin, make sure you have the following ready.
 
 ## 1. Node.js
 
-This link shortener requires Node.js version 18 or later.
+This link shortener requires Node.js version 22 or later.
 
 ### Check your Node.js version
 
@@ -14,7 +14,7 @@ This link shortener requires Node.js version 18 or later.
 node --version
 ```
 
-If not installed or below version 18, download it at: https://nodejs.org/
+If not installed or below version 22, download it at: https://nodejs.org/
 
 > **Tip:** Choose the LTS (Long Term Support) version for stability.
 
@@ -63,7 +63,7 @@ If you want to use your own domain like `go.yourdomain.com`:
 
 ## Checklist
 
-- [ ] Node.js v18+ installed
+- [ ] Node.js v22+ installed
 - [ ] Have a Cloudflare account
 - [ ] Terminal ready to use
 - [ ] (Optional) Code editor installed

@@ -299,6 +299,8 @@ npx wrangler d1 execute link-shortener-db --remote --command "SELECT * FROM link
 
 ### Test API Manually
 
+> Requires an active Cloudflare Access session, or `curl` will get the Access login page instead of JSON — see [06-ZERO-TRUST.md](./06-ZERO-TRUST.md).
+
 ```bash
 curl https://go.yourdomain.com/api/links
 ```
