@@ -33,3 +33,17 @@ export interface ApiResponse<T> {
   data?: T
   error?: string
 }
+
+export interface ApiToken {
+  id: number
+  name: string
+  prefix: string
+  created_at: string
+  last_used_at: string | null
+  revoked_at: string | null
+}
+
+export interface CreatedApiToken {
+  token: string
+  record: ApiToken
+}

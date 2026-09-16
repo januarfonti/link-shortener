@@ -5,6 +5,7 @@ import type { Link, LinkWithAnalytics } from '../types'
 import LinkForm from '../components/LinkForm.vue'
 import LinkList from '../components/LinkList.vue'
 import AnalyticsModal from '../components/AnalyticsModal.vue'
+import TokenManager from '../components/TokenManager.vue'
 
 const { links, loading, error, fetchLinks, createLink, updateLink, deleteLink, getLinkWithAnalytics, clearError } = useLinks()
 
@@ -139,6 +140,9 @@ function copyToClipboard(slug: string) {
         @analytics="openAnalytics"
         @copy="copyToClipboard"
       />
+
+      <!-- API Tokens -->
+      <TokenManager />
     </main>
 
     <!-- Create/Edit Modal -->
