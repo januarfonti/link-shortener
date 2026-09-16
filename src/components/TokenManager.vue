@@ -83,7 +83,9 @@ function formatDate(dateString: string | null): string {
 
     <!-- Create Form -->
     <form @submit.prevent="handleCreate" class="mb-4 flex flex-col sm:flex-row gap-3">
+      <label for="token-name" class="sr-only">Token name</label>
       <input
+        id="token-name"
         v-model="name"
         type="text"
         required

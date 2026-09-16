@@ -23,7 +23,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const token = await verifyToken(context.env.DB, match[1])
     if (!token) return unauthorized()
 
-    context.waitUntil(touchToken(context.env.DB, token.id))
+    context.waitUntil(
+      touchToken(context.env.DB, token.id).catch((error) =>
+        console.error('touchToken failed:', error instanceof Error ? error.message : 'unknown error')
+      )
+    )
 
     // A fresh server and transport per request: stateless mode cannot reuse a transport
     const server = new McpServer(SERVER_INFO, { jsonSchemaValidator: new CfWorkerJsonSchemaValidator() })
